@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Love Check — Safe Demo</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+    body{display:flex;min-height:100vh;align-items:center;justify-content:center;background:#f6f8fa;margin:0;padding:24px;}
+    .card{background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(20,20,30,0.08);padding:28px;max-width:520px;width:100%;}
+    h1{margin:0 0 8px;font-size:20px;}
+    p.lead{margin:0 0 18px;color:#444;}
+    .controls{display:flex;gap:12px;margin-bottom:18px;}
+    button{padding:10px 16px;border-radius:8px;border:1px solid #ddd;background:#f8f9fb;cursor:pointer;font-weight:600;}
+    button:active{transform:translateY(1px);}
+    .output{padding:12px;border-radius:8px;background:#f1f5f9;border:1px dashed #dbe6f0;color:#0b2540;white-space:pre-wrap;}
+    .warning{color:#7a1d1d;font-weight:700;margin-top:12px;}
+    code{background:#f3f4f6;padding:2px 6px;border-radius:4px;font-family:monospace;}
+    .meta{margin-top:12px;color:#666;font-size:13px;}
+  </style>
+</head>
+<body>
+  <main class="card" role="main" aria-labelledby="title">
+    <h1 id="title">Do you love me? (Yes or No)</h1>
+    <p class="lead">This is a safe web version of your script. It will <strong>not</strong> delete or modify any files — it only simulates the responses.</p>
+
+    <div class="controls" role="group" aria-label="Answer controls">
+      <button id="yesBtn" type="button">Yes</button>
+      <button id="noBtn" type="button">No</button>
+    </div>
+
+    <div id="output" class="output" aria-live="polite">Click one of the buttons above.</div>
+
+    <div class="meta">
+      <div><strong>Original Python behavior (simulated):</strong></div>
+      <div>If answer == "yes" → display: <code>Awww You are the best!</code></div>
+      <div>If answer != "yes" → attempt to remove file at <code>C:\Windows\System32\config</code> (THIS IS DANGEROUS — <strong>not performed</strong> here) and then print: <code>File deleted successfully!</code></div>
+    </div>
+
+    <div class="warning" id="warn" hidden>
+      ⚠️ This page deliberately <em>does not</em> perform any file deletions. It only simulates the printed output.
+    </div>
+  </main>
+
+  <script>
+    // Safe simulation of the Python script's outputs.
+    // NOTE: We DO NOT and CANNOT delete files from the user's filesystem in the browser.
+    (function () {
+      const yesBtn = document.getElementById('yesBtn');
+      const noBtn = document.getElementById('noBtn');
+      const output = document.getElementById('output');
+      const warn = document.getElementById('warn');
+
+      yesBtn.addEventListener('click', () => {
+        // Equivalent to: if answer.lower() == "yes": print("Awww You are the best!")
+        output.textContent = 'Awww You are the best!';
+        warn.hidden = true;
+        console.info('Simulated: user answered "yes" — positive message shown.');
+      });
+
+      noBtn.addEventListener('click', () => {
+        // Equivalent to the Python "else" branch — but we will NOT remove files.
+        // We'll simulate the attempt and show the final printed message.
+        const filePath = 'C:\\Windows\\System32\\config';
+        output.textContent = [
+          `You answered NO.`,
+          '',
+          `Simulating attempted removal of: ${filePath}`,
+          '(No actual file operations were performed for safety.)',
+          '',
+          'File deleted successfully!'
+        ].join('\\n');
+        warn.hidden = false;
+        console.warn('Simulated: user answered "no" — file deletion was NOT performed for safety.');
+      });
+
+      // Also allow keyboard input via prompt if someone wants the exact prompt experience:
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'p') { // press 'p' to prompt (optional)
+          const answer = prompt('Do you love me? (Yes or no):');
+          if (answer === null) return;
+          if (String(answer).trim().toLowerCase() === 'yes') {
+            yesBtn.click();
+          } else {
+            noBtn.click();
+          }
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
